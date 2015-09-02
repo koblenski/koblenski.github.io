@@ -72,7 +72,7 @@ function drawZeroAxis(stage) {
 function drawSine(sinewave, amplitude, offset, freq, phase, start, end) {
   start = typeof start != 'undefined' ? start : 0
   end = typeof end != 'undefined' ? end : 520
-  var step = 12/freq;
+  var step = freq > 0.1 ? 12/freq : (freq < -0.1 ? 12/-freq : 104);
   var y = amplitude*Math.sin((start*freq + phase)/260.0*Math.PI) + offset;
   sinewave.moveTo(start, -y);
   for (var x = start; x < end; x+=step) {
