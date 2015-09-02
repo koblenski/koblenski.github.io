@@ -69,13 +69,18 @@ function drawZeroAxis(stage) {
   stage.addChild(xLabel);
 }
 
-function drawSine(sinewave, amplitude, offset, freq, phase) {
-  var y = amplitude*Math.sin(phase/260.0*Math.PI) + offset;
-  sinewave.moveTo(0, -y);
-  for (var x = 0; x <= 520; x+=2) {
+function drawSine(sinewave, amplitude, offset, freq, phase, start, end) {
+  start = typeof start != 'undefined' ? start : 0
+  end = typeof end != 'undefined' ? end : 520
+  var step = 12/freq;
+  var y = amplitude*Math.sin((start*freq + phase)/260.0*Math.PI) + offset;
+  sinewave.moveTo(start, -y);
+  for (var x = start; x < end; x+=step) {
     y = amplitude*Math.sin((x*freq + phase)/260.0*Math.PI) + offset;
     sinewave.lineTo(x, -y);
     sinewave.moveTo(x, -y);
   }
+  y = amplitude*Math.sin((end*freq + phase)/260.0*Math.PI) + offset;
+  sinewave.lineTo(end, -y);
 }
 
