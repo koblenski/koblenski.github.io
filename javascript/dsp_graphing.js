@@ -1,4 +1,4 @@
-function drawPositiveAxis(stage) {
+function drawPositiveAxis(stage, x_labels, y_labels) {
   var graphics = new PIXI.Graphics();
   graphics.lineStyle(1, 0xdddddd, 1);
   graphics.moveTo(15, 280);
@@ -18,16 +18,41 @@ function drawPositiveAxis(stage) {
 
   stage.addChild(graphics);
 
-  var style = { font: 'italic 14px Arial', fill: '#eeeeee' };
-  var x_text = new PIXI.Text('t', style);
-  x_text.x = 540;
-  x_text.y = 272;
-  stage.addChild(x_text);
+  var label_style = { font: '10px Arial', fill: '#eeeeee' };
+  var axis_style = { font: 'italic 14px Arial', fill: '#eeeeee' };
+  if (typeof x_labels != 'undefined') {
+    var x = 55;
+    var step = 52;
+    x_labels.forEach(function(label) {
+      var text = new PIXI.Text(label, label_style)
+      text.x = x
+      text.y = 282
+      stage.addChild(text)
+      x += step
+    })
+  } else {
+    var x_text = new PIXI.Text('t', axis_style);
+    x_text.x = 540;
+    x_text.y = 272;
+    stage.addChild(x_text);
+  }
 
-  var y_text = new PIXI.Text('f(t)', style);
-  y_text.x = 10;
-  y_text.y = 2;
-  stage.addChild(y_text);
+  if (typeof y_labels != 'undefined') {
+    var y = 223;
+    var step = 52;
+    y_labels.forEach(function(label) {
+      var text = new PIXI.Text(label, label_style)
+      text.x = 2
+      text.y = y
+      stage.addChild(text)
+      y -= step
+    })
+  } else {
+    var y_text = new PIXI.Text('f(t)', axis_style);
+    y_text.x = 10;
+    y_text.y = 2;
+    stage.addChild(y_text);
+  }
 }
 
 function drawZeroAxis(stage) {
@@ -83,4 +108,3 @@ function drawSine(sinewave, amplitude, offset, freq, phase, start, end) {
   y = amplitude*Math.sin((end*freq + phase)/260.0*Math.PI) + offset;
   sinewave.lineTo(end, -y);
 }
-
