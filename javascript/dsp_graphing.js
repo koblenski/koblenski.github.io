@@ -1,4 +1,92 @@
 var dsp_graph = (function() {
+  const AXIS_COLOR = 0xdddddd;
+  const TICK_SIZE = 5;
+  const TICK_STEP = 26;
+  const X_AXIS_START = 15;
+  const X_AXIS_MID = 275;
+  const X_AXIS_END = 535;
+  const Y_AXIS_START = 20;
+  const Y_AXIS_MID = 150;
+  const Y_AXIS_END = 280;
+
+  function drawXAxis(graphics, start, end, y) {
+      graphics.moveTo(start, y);
+      graphics.lineTo(end, y);
+
+      for(var x = start+TICK_STEP; x <= end; x += TICK_STEP) {
+        graphics.moveTo(x, y-TICK_SIZE);
+        graphics.lineTo(x, y);
+      }
+      graphics.moveTo(X_AXIS_MID, y - 2*TICK_SIZE);
+      graphics.lineTo(X_AXIS_MID, y);
+  }
+
+  function drawYAxis(graphics, start, end, x, offset) {
+      graphics.moveTo(x, start);
+      graphics.lineTo(x, end);
+
+      for(var y = start+offset; y <= end; y += TICK_STEP) {
+        graphics.moveTo(x, y);
+        graphics.lineTo(x+TICK_SIZE, y);
+      }
+  }
+
+  const LABEL_STYLE = { font: '10px Arial', fill: '#eeeeee' };
+  const AXIS_TITLE_STYLE = { font: 'italic 14px Arial', fill: '#eeeeee' };
+  const X_AXIS_TITLE_X = 540;
+  const X_AXIS_TITLE_Y_LOW = 272;
+  const X_AXIS_TITLE_Y_MID = 142;
+  const X_AXIS_TITLE_Y_HIGH = 77;
+  const X_AXIS_LABEL_X = 273;
+  const X_AXIS_LABEL_Y_MID = 152;
+  const X_AXIS_LABEL_Y_HIGH = 87;
+  const Y_AXIS_TITLE_X = 10;
+  const Y_AXIS_TITLE_Y = 2;
+
+  function drawXTitle(stage, y) {
+    var x_text = new PIXI.Text('t', AXIS_TITLE_STYLE);
+    x_text.x = X_AXIS_TITLE_X;
+    x_text.y = y;
+    stage.addChild(x_text);
+  }
+
+  function drawXLabel(stage, y) {
+    var xLabel = new PIXI.Text('1', { font: '14px Arial', fill: '#eeeeee' });
+    xLabel.x = X_AXIS_LABEL_X;
+    xLabel.y = y;
+    stage.addChild(xLabel);
+  }
+
+  function drawXLabels(stage, labels) {
+    const STEP = 2*TICK_STEP;
+    var x = STEP + 3;
+    labels.forEach(function(label) {
+      var text = new PIXI.Text(label, LABEL_STYLE);
+      text.x = x;
+      text.y = Y_AXIS_END + 2;
+      stage.addChild(text);
+      x += step;
+    });
+  }
+
+  function drawYTitle(stage) {
+    var y_text = new PIXI.Text('f(t)', AXIS_TITLE_STYLE);
+    y_text.x = Y_AXIS_TITLE_X;
+    y_text.y = Y_AXIS_TITLE_Y;
+    stage.addChild(y_text);
+  }
+
+  function drawYLabels(stage, labels) {
+    const STEP = 2*TICK_STEP;
+    var y = Y_AXIS_END - STEP - 5;
+    labels.forEach(function(label) {
+      var text = new PIXI.Text(label, LABEL_STYLE);
+      text.x = 2;
+      text.y = y;
+      stage.addChild(text);
+      y -= STEP;
+    });
+  }
 
   return {
     initCanvas: function(id, eventHandler) {
@@ -14,210 +102,64 @@ var dsp_graph = (function() {
 
     drawPositiveAxis: function(stage, x_labels, y_labels) {
       var graphics = new PIXI.Graphics();
-      graphics.lineStyle(1, 0xdddddd, 1);
-      graphics.moveTo(15, 280);
-      graphics.lineTo(535, 280);
-
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 275);
-        graphics.lineTo(x, 280);
-      }
-
-      graphics.moveTo(15, 20);
-      graphics.lineTo(15, 280);
-      for(var y = 20; y < 280; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
+      graphics.lineStyle(1, AXIS_COLOR, 1);
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, Y_AXIS_END);
+      drawYAxis(graphics, Y_AXIS_START, Y_AXIS_END, X_AXIS_START, 0);
       stage.addChild(graphics);
 
-      var label_style = { font: '10px Arial', fill: '#eeeeee' };
-      var axis_style = { font: 'italic 14px Arial', fill: '#eeeeee' };
       if (typeof x_labels != 'undefined') {
-        var x = 55;
-        var step = 52;
-        x_labels.forEach(function(label) {
-          var text = new PIXI.Text(label, label_style)
-          text.x = x
-          text.y = 282
-          stage.addChild(text)
-          x += step
-        })
+        drawXLabels(stage, x_labels);
       } else {
-        var x_text = new PIXI.Text('t', axis_style);
-        x_text.x = 540;
-        x_text.y = 272;
-        stage.addChild(x_text);
+        drawXTitle(stage, X_AXIS_TITLE_Y_LOW);
       }
 
       if (typeof y_labels != 'undefined') {
-        var y = 223;
-        var step = 52;
-        y_labels.forEach(function(label) {
-          var text = new PIXI.Text(label, label_style)
-          text.x = 2
-          text.y = y
-          stage.addChild(text)
-          y -= step
-        })
+        drawYLabels(stage, y_labels);
       } else {
-        var y_text = new PIXI.Text('f(t)', axis_style);
-        y_text.x = 10;
-        y_text.y = 2;
-        stage.addChild(y_text);
+        drawYTitle(stage);
       }
     },
 
     drawZeroAxis: function(stage) {
       var graphics = new PIXI.Graphics();
-      graphics.lineStyle(1, 0xdddddd, 1);
-      graphics.moveTo(15, 150);
-      graphics.lineTo(535, 150);
-
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 145);
-        graphics.lineTo(x, 150);
-      }
-      graphics.moveTo(275, 140);
-      graphics.lineTo(275, 150);
-
-      graphics.moveTo(15, 20);
-      graphics.lineTo(15, 280);
-      for(var y = 20; y <= 280; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
+      graphics.lineStyle(1, AXIS_COLOR, 1);
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, Y_AXIS_MID);
+      drawYAxis(graphics, Y_AXIS_START, Y_AXIS_END, X_AXIS_START, 0);
       stage.addChild(graphics);
 
-      var style = { font: 'italic 14px Arial', fill: '#eeeeee' };
-      var x_text = new PIXI.Text('t', style);
-      x_text.x = 540;
-      x_text.y = 142;
-      stage.addChild(x_text);
-
-      var y_text = new PIXI.Text('f(t)', style);
-      y_text.x = 10;
-      y_text.y = 2;
-      stage.addChild(y_text);
-
-      var xLabel = new PIXI.Text('1', { font: '14px Arial', fill: '#eeeeee' });
-      xLabel.x = 273;
-      xLabel.y = 152;
-      stage.addChild(xLabel);
+      drawXTitle(stage, X_AXIS_TITLE_Y_MID);
+      drawYTitle(stage);
+      drawXLabel(stage, X_AXIS_LABEL_Y_MID);
     },
 
     drawDualAxis: function(stage) {
       var graphics = new PIXI.Graphics();
-      graphics.lineStyle(1, 0xdddddd, 1);
-      graphics.moveTo(15, 85);
-      graphics.lineTo(535, 85);
+      graphics.lineStyle(1, AXIS_COLOR, 1);
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, 85);
+      drawYAxis(graphics, Y_AXIS_START, Y_AXIS_MID, X_AXIS_START, TICK_STEP/2);
 
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 80);
-        graphics.lineTo(x, 85);
-      }
-      graphics.moveTo(275, 75);
-      graphics.lineTo(275, 85);
-
-      graphics.moveTo(15, 20);
-      graphics.lineTo(15, 150);
-      for(var y = 33; y <= 150; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
-      graphics.moveTo(15, 228);
-      graphics.lineTo(535, 228);
-
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 223);
-        graphics.lineTo(x, 228);
-      }
-      graphics.moveTo(275, 218);
-      graphics.lineTo(275, 228);
-
-      graphics.moveTo(15, 176);
-      graphics.lineTo(15, 280);
-      for(var y = 176; y <= 280; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, 228);
+      drawYAxis(graphics, 176, Y_AXIS_END, X_AXIS_START, 0);
       stage.addChild(graphics);
 
-      var style = { font: 'italic 14px Arial', fill: '#eeeeee' };
-      var x_text = new PIXI.Text('t', style);
-      x_text.x = 540;
-      x_text.y = 77;
-      stage.addChild(x_text);
-
-      var y_text = new PIXI.Text('f(t)', style);
-      y_text.x = 10;
-      y_text.y = 2;
-      stage.addChild(y_text);
-
-      var xLabel = new PIXI.Text('1', { font: '14px Arial', fill: '#eeeeee' });
-      xLabel.x = 273;
-      xLabel.y = 87;
-      stage.addChild(xLabel);
+      drawXTitle(stage, X_AXIS_TITLE_Y_HIGH);
+      drawYTitle(stage);
+      drawXLabel(stage, X_AXIS_LABEL_Y_HIGH);
     },
 
     drawDualPositiveAxis: function(stage) {
       var graphics = new PIXI.Graphics();
-      graphics.lineStyle(1, 0xdddddd, 1);
-      graphics.moveTo(15, 85);
-      graphics.lineTo(535, 85);
+      graphics.lineStyle(1, AXIS_COLOR, 1);
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, 85);
+      drawYAxis(graphics, Y_AXIS_START, Y_AXIS_MID, X_AXIS_START, TICK_STEP/2);
 
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 80);
-        graphics.lineTo(x, 85);
-      }
-      graphics.moveTo(275, 75);
-      graphics.lineTo(275, 85);
-
-      graphics.moveTo(15, 20);
-      graphics.lineTo(15, 150);
-      for(var y = 33; y <= 150; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
-      graphics.moveTo(15, 280);
-      graphics.lineTo(535, 280);
-
-      for(var x = 41; x <= 535; x += 26) {
-        graphics.moveTo(x, 275);
-        graphics.lineTo(x, 280);
-      }
-      graphics.moveTo(275, 270);
-      graphics.lineTo(275, 280);
-
-      graphics.moveTo(15, 176);
-      graphics.lineTo(15, 280);
-      for(var y = 176; y <= 280; y += 26) {
-        graphics.moveTo(15, y);
-        graphics.lineTo(20, y);
-      }
-
+      drawXAxis(graphics, X_AXIS_START, X_AXIS_END, Y_AXIS_END);
+      drawYAxis(graphics, 176, Y_AXIS_END, X_AXIS_START, 0);
       stage.addChild(graphics);
 
-      var style = { font: 'italic 14px Arial', fill: '#eeeeee' };
-      var x_text = new PIXI.Text('t', style);
-      x_text.x = 540;
-      x_text.y = 77;
-      stage.addChild(x_text);
-
-      var y_text = new PIXI.Text('f(t)', style);
-      y_text.x = 10;
-      y_text.y = 2;
-      stage.addChild(y_text);
-
-      var xLabel = new PIXI.Text('1', { font: '14px Arial', fill: '#eeeeee' });
-      xLabel.x = 273;
-      xLabel.y = 87;
-      stage.addChild(xLabel);
+      drawXTitle(stage, X_AXIS_TITLE_Y_HIGH);
+      drawYTitle(stage);
+      drawXLabel(stage, X_AXIS_LABEL_Y_HIGH);
     },
 
     drawSine: function(sinewave, amplitude, offset, freq, phase, start, end) {
