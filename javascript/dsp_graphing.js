@@ -65,7 +65,7 @@ var dsp_graph = (function() {
       text.x = x;
       text.y = Y_AXIS_END + 2;
       stage.addChild(text);
-      x += step;
+      x += STEP;
     });
   }
 
