@@ -118,6 +118,8 @@ var dsp_graph = (function() {
       } else {
         drawYTitle(stage);
       }
+
+      stage.origin = {x: X_AXIS_START, y: Y_AXIS_END};
     },
 
     drawZeroAxis: function(stage) {
@@ -162,6 +164,21 @@ var dsp_graph = (function() {
       drawXLabel(stage, X_AXIS_LABEL_Y_HIGH);
     },
 
+    createCurve: function(stage) {
+      var curve = new PIXI.Graphics();
+      stage.addChild(curve);
+      curve.setTransform(stage.origin.x, stage.origin.y, TICK_STEP, -TICK_STEP);
+      return curve;
+    },
+
+    drawCurve: function(curve, color, points) {
+      curve.lineStyle(2.0/TICK_STEP, color, 1);
+      curve.moveTo(points.x[0], points.y[0]);
+      for (var i = 1; i < points.x.length; i++) {
+        curve.lineTo(points.x[i], points.y[i]);
+      }
+    },
+
     drawSine: function(sinewave, amplitude, offset, freq, phase, start, end) {
       start = typeof start != 'undefined' ? start : 0
       end = typeof end != 'undefined' ? end : 520
@@ -175,6 +192,6 @@ var dsp_graph = (function() {
       }
       y = amplitude*Math.sin((end*freq + phase)/260.0*Math.PI) + offset;
       sinewave.lineTo(end, -y);
-    }
+    },
   }
 }());
