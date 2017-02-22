@@ -132,6 +132,8 @@ var dsp_graph = (function() {
       drawXTitle(stage, X_AXIS_TITLE_Y_MID);
       drawYTitle(stage);
       drawXLabel(stage, X_AXIS_LABEL_Y_MID);
+
+      stage.origin = {x: X_AXIS_START, y: Y_AXIS_MID};
     },
 
     drawDualAxis: function(stage) {
@@ -179,19 +181,21 @@ var dsp_graph = (function() {
       }
     },
 
-    drawSine: function(sinewave, amplitude, offset, freq, phase, start, end) {
-      start = typeof start != 'undefined' ? start : 0
-      end = typeof end != 'undefined' ? end : 520
-      var step = freq > 0.1 ? 12/freq : (freq < -0.1 ? 12/-freq : 104);
-      var y = amplitude*Math.sin((start*freq + phase)/260.0*Math.PI) + offset;
-      sinewave.moveTo(start, -y);
-      for (var x = start; x < end; x+=step) {
-        y = amplitude*Math.sin((x*freq + phase)/260.0*Math.PI) + offset;
-        sinewave.lineTo(x, -y);
-        sinewave.moveTo(x, -y);
+    generateSine: function(amplitude, offset, freq, phase, start, end) {
+      var step = Math.abs(freq) > 0.1 ? 0.5/Math.abs(freq) : 5;
+      var points = {x:[],y:[]};
+      for (var x = start; x <= end; x+=step) {
+        points.x.push(x);
+        points.y.push(amplitude*Math.sin((x*freq + phase)/10.0*Math.PI) + offset);
       }
-      y = amplitude*Math.sin((end*freq + phase)/260.0*Math.PI) + offset;
-      sinewave.lineTo(end, -y);
+      return points;
+    },
+
+    drawSine: function(sinewave, color, amplitude, offset, freq, phase, start, end) {
+      start = typeof start != 'undefined' ? start : 0
+      end = typeof end != 'undefined' ? end : 20
+      var points = this.generateSine(amplitude, offset, freq, phase, start, end);
+      this.drawCurve(sinewave, color, points);
     },
   }
 }());
