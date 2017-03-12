@@ -197,5 +197,13 @@ var dsp_graph = (function() {
       var points = this.generateSine(amplitude, offset, freq, phase, start, end);
       this.drawCurve(sinewave, color, points);
     },
+
+    annotate: function(stage, text, color, origin) {
+      var annotation = new PIXI.Text(text, { font: 'italic 14px Arial', fill: color });
+      annotation.x = origin.x;
+      annotation.y = origin.y;
+      stage.addChild(annotation);
+      return annotation;
+    },
   }
 }());
