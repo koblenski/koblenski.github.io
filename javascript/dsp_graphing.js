@@ -2,6 +2,7 @@ var dsp_graph = (function() {
   const AXIS_COLOR = 0xdddddd;
   const TICK_SIZE = 5;
   const TICK_STEP = 26;
+  const UNIT_FREQ = 10;
   const X_AXIS_START = 15;
   const X_AXIS_MID = 275;
   const X_AXIS_END = 535;
@@ -186,7 +187,7 @@ var dsp_graph = (function() {
       var points = {x:[],y:[]};
       for (var x = start; x <= end; x+=step) {
         points.x.push(x);
-        points.y.push(amplitude*Math.sin((x*freq + phase)/10.0*Math.PI) + offset);
+        points.y.push(amplitude*Math.sin((x*freq + phase)/UNIT_FREQ*Math.PI) + offset);
       }
       return points;
     },
@@ -204,6 +205,25 @@ var dsp_graph = (function() {
       annotation.y = origin.y;
       stage.addChild(annotation);
       return annotation;
+    },
+
+    drawSamples: function(sinewave, amplitude, freq, phase, start, end, step) {
+      var samples = [];
+      for (var x = start; x <= end; x+=step) {
+        var y = amplitude*Math.sin((x*freq + phase)/UNIT_FREQ*Math.PI);
+        sinewave.drawCircle(x, y, 3/TICK_STEP);
+        samples.push(y);
+      }
+      return samples;
+    },
+
+    drawSampleBlip: function(sinewave, amplitude, freq, phase, sample_offset, x) {
+      var y = amplitude*Math.sin((x*freq + phase)/UNIT_FREQ*Math.PI);
+      sinewave.drawCircle(x,y,2/TICK_STEP);
+      if (sample_offset <= 0.3) {
+        y = amplitude*Math.sin((x*freq + phase - sample_offset)/UNIT_FREQ*Math.PI);
+        sinewave.drawCircle(x - sample_offset, y, sample_offset);
+      }
     },
   }
 }());
