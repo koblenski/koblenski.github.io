@@ -182,6 +182,18 @@ var dsp_graph = (function() {
       }
     },
 
+    drawYPoints: function(curve, color, points) {
+      curve.lineStyle(2.0/TICK_STEP, color, 1);
+      var x = 0;
+      var step = 20.0 / points.length;
+      curve.moveTo(x, points[0]*2);
+      points.forEach(function(y) {
+        curve.lineTo(x, y*2);
+        curve.moveTo(x, y*2);
+        x += step;
+      })
+    },
+
     generateSine: function(amplitude, offset, freq, phase, start, end) {
       var step = Math.abs(freq) > 0.1 ? 0.5/Math.abs(freq) : 5;
       var points = {x:[],y:[]};
@@ -224,6 +236,28 @@ var dsp_graph = (function() {
         y = amplitude*Math.sin((x*freq + phase - sample_offset)/UNIT_FREQ*Math.PI);
         sinewave.drawCircle(x - sample_offset, y, sample_offset);
       }
+    },
+
+    mean: function(ary) {
+      return ary.reduce(function(a, b) { return a + b; }) / ary.length;
+    },
+
+    filter: function(ary, taps) {
+      if (ary.length < taps.length) {
+        var gain = taps.slice(0, ary.length).reduce(function(a, b) { return a + b; })
+        taps = taps.map(function(a) { return a / gain })
+      }
+      return ary.reduce(function(a, b, i) { return a + b*taps[i] }, 0)
+    },
+
+    genFilter: function(n) {
+      var taps = []
+      for (var i = 0.5-n/2.0; i < n/2.0; i+=1.0) {
+        taps.push(Math.sin(Math.PI*i/26.0) / (Math.PI*i/26.0))
+      }
+      var gain = taps.reduce(function(a, b) { return a + b; })
+      taps = taps.map(function(a) { return a / gain })
+      return taps
     },
   }
 }());
