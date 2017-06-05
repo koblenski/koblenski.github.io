@@ -1,3 +1,3 @@
-drawChessBoard(id) {
+function drawChessBoard(id) {
   return ChessBoard(id, 'start');
-}
+};
