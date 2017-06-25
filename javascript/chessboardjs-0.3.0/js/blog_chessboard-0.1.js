@@ -46,6 +46,6 @@ var blog_chessboard = (function() {
         board.position(game.fen());
         i = history.length;
       });
-    }
+    },
   }
 }());
