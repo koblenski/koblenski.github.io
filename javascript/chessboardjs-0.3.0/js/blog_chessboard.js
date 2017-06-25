@@ -1,4 +1,4 @@
-;(function() {
+$(function() {
 function drawChessBoard(cfg) {
   var board = ChessBoard('board' + cfg.id, cfg);
   var game = new Chess();
