@@ -6,12 +6,29 @@ var blog_chessboard = (function() {
 
       // 1. Load a PGN into the game
       game.load_pgn(cfg.pgn);
-      $('#pgn' + cfg.id).html(cfg.pgn);
+      if (cfg.move === undefined) {
+        cfg.move = 1;
+      }
+
+      var prefix = '';
+      if (cfg.move % 2 === 0) {
+        prefix = String(cfg.move / 2) + '. ... ';
+      }
+      $('#pgn' + cfg.id).html(prefix + cfg.pgn.split(' ').slice(cfg.move-1).join(' '));
 
       // 2. Get the full move history
       var history = game.history();
-      game.reset();
       var i = 0;
+
+      function setup() {
+        game.reset();
+        for (i = 0;i < cfg.move - 1; i++) {
+          game.move(history[i]);
+        }
+        board.position(game.fen());
+      }
+
+      setup();
 
       // 3. If Next button clicked, move forward one
       $('#nextBtn' + cfg.id).on('click', function() {
@@ -34,11 +51,7 @@ var blog_chessboard = (function() {
       });
 
       // 5. If Start button clicked, go to start position
-      $('#startPositionBtn' + cfg.id).on('click', function() {
-        game.reset();
-        board.start();
-        i = 0;
-      });
+      $('#startPositionBtn' + cfg.id).on('click', setup);
 
       // 6. If End button clicked, go to end position
       $('#endPositionBtn' + cfg.id).on('click', function() {
