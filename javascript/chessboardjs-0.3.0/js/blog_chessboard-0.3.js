@@ -4,8 +4,6 @@ var blog_chessboard = (function() {
       var board = ChessBoard('board' + cfg.id, cfg);
       var game = new Chess();
 
-      // 1. Load a PGN into the game
-      game.load_pgn(cfg.pgn);
       if (cfg.move === undefined) {
         cfg.move = 1;
       }
@@ -17,12 +15,18 @@ var blog_chessboard = (function() {
       $('#pgn' + cfg.id).html(prefix + cfg.pgn.split(' ').slice(cfg.move-1).join(' '));
 
       // 2. Get the full move history
-      var history = game.history();
+      var history = cfg.pgn.split(' ').map(function(move) {
+        return move.slice(move.indexOf('.') + 1);
+      });
       var i = 0;
 
       function setup() {
-        game.reset();
-        for (i = 0;i < cfg.move - 1; i++) {
+        if (cfg.position === 'start') {
+          game.reset();
+        } else {
+          game.load(cfg.position);
+        }
+        for (i = 0; i < cfg.move - 1; i++) {
           game.move(history[i]);
         }
         board.position(game.fen());
@@ -55,9 +59,10 @@ var blog_chessboard = (function() {
 
       // 6. If End button clicked, go to end position
       $('#endPositionBtn' + cfg.id).on('click', function() {
-        game.load_pgn(pgn);
+        for (; i < history.length; i++) {
+          game.move(history[i]);
+        }
         board.position(game.fen());
-        i = history.length;
       });
     },
   }
