@@ -18,6 +18,9 @@ var blog_chessboard = (function() {
       var history = cfg.pgn.split(' ').map(function(move) {
         return move.slice(move.indexOf('.') + 1);
       });
+      if (history[0] === '...') {
+        history = history.slice(1);
+      }
       var i = 0;
 
       function setup() {
@@ -26,6 +29,7 @@ var blog_chessboard = (function() {
         } else {
           game.load(cfg.position);
         }
+
         for (i = 0; i < cfg.move - 1; i++) {
           game.move(history[i]);
         }
